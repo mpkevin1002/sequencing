@@ -3,14 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>生活步驟排序大師 - 認知訓練遊戲</title>
-    <!-- 1. 核心程式庫：React 與 Babel (確保能執行 JSX) -->
+    <title>生活步驟排序大師 - 100題挑戰版</title>
+    <!-- 1. 核心程式庫 -->
     <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-    <!-- 2. 樣式庫：Tailwind CSS -->
+    <!-- 2. 樣式與圖標 -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- 3. 圖示庫：Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
         @keyframes shake {
@@ -30,16 +29,16 @@
             align-items: center;
             height: 100vh;
             font-family: sans-serif;
-            background: #f8fafc;
+            background: #f1f5f9;
         }
     </style>
 </head>
 <body class="bg-slate-50">
-    <!-- 載入中提示：如果看到這個代表網頁正在解析代碼 -->
+    <!-- 載入中畫面 -->
     <div id="loader">
         <div class="text-center">
-            <div class="inline-block w-8 h-8 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin mb-2"></div>
-            <div class="text-slate-500 font-bold">遊戲載入中，請稍候...</div>
+            <div class="inline-block w-10 h-10 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin mb-4"></div>
+            <div class="text-slate-600 font-bold text-lg">正在啟動遊戲系統...</div>
         </div>
     </div>
 
@@ -48,15 +47,14 @@
     <script type="text/babel">
         const { useState, useEffect, useRef } = React;
         
-        // 圖示組件：確保 Lucide 能正確渲染
-        const Icon = ({ name, size = 24, className = "" }) => {
-            const iconRef = useRef(null);
+        // 渲染圖標的組件
+        const LucideIcon = ({ name, size = 24, className = "" }) => {
             useEffect(() => {
                 if (window.lucide) {
                     window.lucide.createIcons();
                 }
-            }, [name, className]);
-            return <i data-lucide={name} className={className} style={{ width: size, height: size }}></i>;
+            });
+            return <i data-lucide={name} className={className} style={{ width: size, height: size, display: 'inline-block' }}></i>;
         };
 
         const TASKS_LIBRARY = [
@@ -178,15 +176,18 @@
             
             const timerRef = useRef(null);
 
-            // 隱藏載入提示
+            // 當 React 載入完成，隱藏 Loader
             useEffect(() => {
                 const loader = document.getElementById('loader');
                 if (loader) loader.style.display = 'none';
             }, []);
 
+            // 計時器邏輯
             useEffect(() => {
                 if (gameState === 'playing') {
-                    timerRef.current = setInterval(() => setTimer(prev => prev + 1), 1000);
+                    timerRef.current = setInterval(() => {
+                        setTimer(prev => prev + 1);
+                    }, 1000);
                 } else {
                     clearInterval(timerRef.current);
                 }
@@ -210,6 +211,7 @@
 
             const handleStepClick = (step) => {
                 if (feedback === 'correct' || userSequence.includes(step)) return;
+
                 const nextSequence = [...userSequence, step];
                 const currentIndex = nextSequence.length - 1;
 
@@ -242,33 +244,35 @@
                 <div className="min-h-screen p-4 md:p-8 font-sans text-slate-800">
                     <div className="max-w-2xl mx-auto bg-white rounded-3xl shadow-2xl overflow-hidden border border-slate-100">
                         
+                        {/* 標頭 */}
                         <div className="bg-indigo-700 p-6 text-white flex justify-between items-center shadow-lg">
                             <div>
                                 <h1 className="text-2xl font-bold flex items-center tracking-tight">
-                                    <Icon name="layers" size={26} className="mr-2" /> 生活步驟大師
+                                    <LucideIcon name="layers" size={26} className="mr-2" /> 生活步驟大師
                                 </h1>
                                 <p className="text-indigo-200 text-xs mt-1 uppercase tracking-widest font-semibold">100+ 任務訓練系統</p>
                             </div>
                             <div className="flex gap-2">
                                 {gameState !== 'menu' && (
                                     <button onClick={() => setGameState('history')} className="p-2 bg-indigo-600 hover:bg-indigo-500 rounded-full transition-all">
-                                        <Icon name="history" size={20} />
+                                        <LucideIcon name="history" size={20} />
                                     </button>
                                 )}
                                 {gameState !== 'menu' && (
                                     <button onClick={() => setGameState('menu')} className="p-2 bg-indigo-600 hover:bg-indigo-500 rounded-full transition-all">
-                                        <Icon name="home" size={20} />
+                                        <LucideIcon name="home" size={20} />
                                     </button>
                                 )}
                             </div>
                         </div>
 
                         <div className="p-6">
+                            {/* 主選單 */}
                             {gameState === 'menu' && (
                                 <div className="space-y-6 text-center py-4">
                                     <div className="flex justify-center gap-4 mb-2">
                                         <button onClick={() => setGameState('history')} className="flex items-center gap-2 px-4 py-2 bg-slate-100 text-slate-600 rounded-full hover:bg-slate-200 transition-colors font-bold text-sm">
-                                            <Icon name="history" size={16} /> 查看歷史成績
+                                            <LucideIcon name="history" size={16} /> 查看歷史成績
                                         </button>
                                     </div>
                                     <h2 className="text-xl font-bold text-slate-600">請選擇挑戰難度：</h2>
@@ -276,28 +280,29 @@
                                         <button onClick={() => selectDifficulty('basic')} className="group relative overflow-hidden p-8 bg-white border-4 border-emerald-100 rounded-3xl hover:border-emerald-500 transition-all hover:shadow-xl">
                                             <div className="text-5xl mb-4 group-hover:scale-110 transition-transform">🌱</div>
                                             <h3 className="text-2xl font-black text-emerald-700">基礎等級</h3>
-                                            <div className="mt-3 flex flex-col items-center">
-                                                <span className="bg-emerald-100 text-emerald-700 px-3 py-1 rounded-full text-xs font-bold mb-1">50 個任務</span>
-                                                <span className="text-emerald-600/70 font-bold">每題 5 步驟</span>
+                                            <div className="mt-3 flex flex-col items-center text-emerald-600/70 font-bold">
+                                                <span className="bg-emerald-100 text-emerald-700 px-3 py-1 rounded-full text-xs mb-1">50 個任務</span>
+                                                <span>每題 5 步驟</span>
                                             </div>
                                         </button>
                                         <button onClick={() => selectDifficulty('advanced')} className="group relative overflow-hidden p-8 bg-white border-4 border-amber-100 rounded-3xl hover:border-amber-500 transition-all hover:shadow-xl">
                                             <div className="text-5xl mb-4 group-hover:scale-110 transition-transform">🌳</div>
                                             <h3 className="text-2xl font-black text-amber-700">進階等級</h3>
-                                            <div className="mt-3 flex flex-col items-center">
-                                                <span className="bg-amber-100 text-amber-700 px-3 py-1 rounded-full text-xs font-bold mb-1">50 個任務</span>
-                                                <span className="text-amber-600/70 font-bold">每題 7 步驟</span>
+                                            <div className="mt-3 flex flex-col items-center text-amber-600/70 font-bold">
+                                                <span className="bg-amber-100 text-amber-700 px-3 py-1 rounded-full text-xs mb-1">50 個任務</span>
+                                                <span>每題 7 步驟</span>
                                             </div>
                                         </button>
                                     </div>
                                 </div>
                             )}
 
+                            {/* 任務清單 */}
                             {gameState === 'taskSelection' && (
                                 <div className="space-y-4">
                                     <div className="flex justify-between items-center border-b pb-4 mb-4">
                                         <button onClick={() => setGameState('menu')} className="flex items-center text-indigo-600 font-bold hover:translate-x-1 transition-transform">
-                                            <Icon name="chevron-left" size={20} /> 返回
+                                            <LucideIcon name="chevron-left" size={20} /> 返回
                                         </button>
                                         <div className={`px-4 py-1 rounded-full text-xs font-black uppercase ${difficulty === 'basic' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'}`}>
                                             {difficulty === 'basic' ? '基礎任務' : '進階任務'}
@@ -307,97 +312,72 @@
                                         {filteredTasks.map(task => (
                                             <button key={task.id} onClick={() => startTask(task)} className="flex items-center p-4 bg-slate-50 border-2 border-transparent rounded-2xl hover:bg-white hover:border-indigo-400 hover:shadow-lg transition-all text-left group">
                                                 <span className="text-3xl mr-4 bg-white w-12 h-12 flex items-center justify-center rounded-xl shadow-sm group-hover:scale-110 transition-transform">{task.icon}</span>
-                                                <div className="flex-1">
-                                                    <span className="text-lg font-bold text-slate-700 block">{task.title}</span>
-                                                    <span className="text-xs text-slate-400 font-medium tracking-tight">ID: #{task.id}</span>
-                                                </div>
-                                                <Icon name="arrow-right" size={18} className="text-slate-300 group-hover:text-indigo-500" />
+                                                <div className="flex-1 font-bold text-slate-700">{task.title}</div>
+                                                <LucideIcon name="arrow-right" size={18} className="text-slate-300 group-hover:text-indigo-500" />
                                             </button>
                                         ))}
                                     </div>
                                 </div>
                             )}
 
+                            {/* 成績清單 */}
                             {gameState === 'history' && (
                                 <div className="space-y-4">
-                                    <div className="flex justify-between items-center border-b pb-4 mb-4">
-                                        <h2 className="text-xl font-black text-slate-700 flex items-center">
-                                            <Icon name="history" className="mr-2 text-indigo-600" /> 學習成就榜
-                                        </h2>
-                                        <button onClick={() => setHistoryRecords([])} className="text-red-400 hover:text-red-600 flex items-center text-xs font-bold">
-                                            <Icon name="trash-2" size={14} className="mr-1" /> 清除
-                                        </button>
+                                    <div className="flex justify-between items-center border-b pb-4 mb-4 font-black">
+                                        <h2 className="text-xl text-slate-700 flex items-center"><LucideIcon name="history" className="mr-2 text-indigo-600" /> 成就榜</h2>
+                                        <button onClick={() => setHistoryRecords([])} className="text-red-400 hover:text-red-600 flex items-center text-xs"><LucideIcon name="trash-2" size={14} className="mr-1" /> 清除</button>
                                     </div>
-                                    {historyRecords.length === 0 ? (
-                                        <div className="py-20 text-center text-slate-400">
-                                            <Icon name="bar-chart" size={48} className="mx-auto mb-4 opacity-20" />
-                                            <p className="font-bold">目前還沒有紀錄喔！</p>
-                                        </div>
-                                    ) : (
-                                        <div className="space-y-3 max-h-[500px] overflow-y-auto pr-2 custom-scrollbar">
+                                    {historyRecords.length === 0 ? <div className="py-20 text-center text-slate-400 font-bold italic">目前還沒有挑戰紀錄喔！</div> : (
+                                        <div className="space-y-3 max-h-[500px] overflow-y-auto pr-2 custom-scrollbar font-bold">
                                             {historyRecords.map(record => (
-                                                <div key={record.id} className="p-4 bg-slate-50 rounded-2xl border border-slate-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+                                                <div key={record.id} className="p-4 bg-slate-50 rounded-2xl border flex justify-between items-center text-sm">
                                                     <div>
-                                                        <div className="flex items-center gap-2 mb-1">
-                                                            <span className={`w-2 h-2 rounded-full ${record.difficulty === 'basic' ? 'bg-emerald-500' : 'bg-amber-500'}`}></span>
-                                                            <h4 className="font-black text-slate-700">{record.title}</h4>
-                                                        </div>
-                                                        <div className="flex items-center text-[10px] text-slate-400 font-bold tracking-tighter uppercase">
-                                                            <Icon name="calendar" size={12} className="mr-1" /> {record.date}
-                                                        </div>
+                                                        <div className="text-slate-700">{record.title}</div>
+                                                        <div className="text-[10px] text-slate-400 uppercase tracking-tighter">{record.date}</div>
                                                     </div>
                                                     <div className="flex gap-4">
-                                                        <div className="text-center">
-                                                            <div className="text-[10px] text-slate-400 font-bold">耗時</div>
-                                                            <div className="font-black text-indigo-600 text-sm">{formatTime(record.time)}</div>
-                                                        </div>
-                                                        <div className="text-center">
-                                                            <div className="text-[10px] text-slate-400 font-bold">錯誤</div>
-                                                            <div className={`font-black text-sm ${record.errors > 0 ? 'text-red-500' : 'text-emerald-500'}`}>{record.errors}</div>
-                                                        </div>
+                                                        <div className="text-indigo-600">{formatTime(record.time)}</div>
+                                                        <div className="text-red-500">{record.errors} 誤</div>
                                                     </div>
                                                 </div>
                                             ))}
                                         </div>
                                     )}
-                                    <button onClick={() => setGameState('menu')} className="w-full mt-4 py-3 bg-indigo-600 text-white rounded-xl font-bold shadow-lg hover:bg-indigo-700 transition-colors">返回</button>
+                                    <button onClick={() => setGameState('menu')} className="w-full mt-4 py-3 bg-indigo-600 text-white rounded-xl font-bold shadow-lg">返回主選單</button>
                                 </div>
                             )}
 
+                            {/* 遊戲中 */}
                             {gameState === 'playing' && currentTask && (
                                 <div className="space-y-6">
-                                    <div className="flex justify-between items-center bg-slate-50 px-4 py-2 rounded-full border border-slate-100">
-                                        <div className="flex items-center text-indigo-600 font-black">
-                                            <Icon name="clock" size={16} className="mr-1" /> {formatTime(timer)}
-                                        </div>
-                                        <div className="flex items-center text-red-500 font-black">
-                                            <Icon name="alert-triangle" size={16} className="mr-1" /> 錯誤: {mistakes}
-                                        </div>
+                                    <div className="flex justify-between items-center bg-slate-50 px-4 py-2 rounded-full border text-xs font-black">
+                                        <div className="text-indigo-600 flex items-center"><LucideIcon name="clock" size={14} className="mr-1" /> {formatTime(timer)}</div>
+                                        <div className="text-red-500 flex items-center"><LucideIcon name="alert-triangle" size={14} className="mr-1" /> 錯誤: {mistakes}</div>
                                     </div>
-                                    <div className="text-center">
+                                    <div className="text-center font-black">
                                         <span className="text-5xl mb-2 block">{currentTask.icon}</span>
-                                        <h2 className="text-2xl font-black text-slate-800">{currentTask.title}</h2>
-                                        <p className="text-slate-400 text-sm font-bold">請按正確順序點選下方步驟</p>
+                                        <h2 className="text-2xl text-slate-800">{currentTask.title}</h2>
+                                        <p className="text-slate-400 text-sm">請按正確順序點選步驟</p>
                                     </div>
                                     <div className="min-h-[160px] bg-indigo-50/50 rounded-3xl p-5 border-2 border-dashed border-indigo-200">
-                                        <div className="flex flex-wrap gap-3">
+                                        <div className="flex flex-wrap gap-2">
                                             {userSequence.map((step, idx) => (
-                                                <div key={idx} className="bg-white text-indigo-700 border-2 border-indigo-600 px-4 py-2 rounded-2xl flex items-center shadow-sm">
-                                                    <span className="mr-3 font-black bg-indigo-600 text-white w-6 h-6 rounded-full flex items-center justify-center text-[10px]">{idx + 1}</span>
-                                                    <span className="font-bold text-sm">{step}</span>
+                                                <div key={idx} className="bg-white text-indigo-700 border-2 border-indigo-600 px-4 py-2 rounded-xl flex items-center shadow-sm font-bold text-sm">
+                                                    <span className="mr-2 font-black bg-indigo-600 text-white w-5 h-5 rounded-full flex items-center justify-center text-[10px]">{idx + 1}</span>
+                                                    {step}
                                                 </div>
                                             ))}
                                         </div>
                                     </div>
-                                    <div className="h-6 flex justify-center items-center">
-                                        {feedback === 'correct' && <div className="text-emerald-600 font-black flex items-center"><Icon name="check-circle-2" size={18} className="mr-2"/>正確！</div>}
-                                        {feedback === 'incorrect' && <div className="text-red-500 font-black animate-shake flex items-center"><Icon name="x-circle" size={18} className="mr-2"/>順序不對喔！</div>}
+                                    <div className="h-6 flex justify-center items-center text-sm font-black">
+                                        {feedback === 'correct' && <div className="text-emerald-600 flex items-center">正確！</div>}
+                                        {feedback === 'incorrect' && <div className="text-red-500 animate-shake flex items-center">順序不對喔！</div>}
                                     </div>
                                     <div className="grid grid-cols-1 gap-2">
                                         {shuffledOptions.map((step, idx) => {
                                             const isSelected = userSequence.includes(step);
                                             return (
-                                                <button key={idx} disabled={isSelected || feedback} onClick={() => handleStepClick(step)} className={`text-left p-4 rounded-2xl border-2 transition-all font-bold ${isSelected ? 'bg-slate-50 border-slate-100 text-slate-300 line-through opacity-50' : 'bg-white border-slate-200 text-slate-700 hover:border-indigo-400 shadow-sm'}`}>
+                                                <button key={idx} disabled={isSelected || feedback} onClick={() => handleStepClick(step)} className={`text-left p-4 rounded-2xl border-2 transition-all font-bold text-sm ${isSelected ? 'bg-slate-50 border-slate-100 text-slate-300 line-through opacity-50' : 'bg-white border-slate-200 text-slate-700 hover:border-indigo-400'}`}>
                                                     {step}
                                                 </button>
                                             );
@@ -406,29 +386,24 @@
                                 </div>
                             )}
 
+                            {/* 結果頁 */}
                             {gameState === 'result' && (
                                 <div className="text-center py-8 space-y-6">
-                                    <div className="p-8 bg-yellow-50 rounded-full text-yellow-500 inline-block animate-pulse">
-                                        <Icon name="award" size={80} />
-                                    </div>
-                                    <h2 className="text-3xl font-black text-slate-800">完成任務！</h2>
-                                    <div className="grid grid-cols-2 gap-4 max-w-sm mx-auto">
+                                    <div className="p-8 bg-yellow-50 rounded-full text-yellow-500 inline-block animate-pulse"><LucideIcon name="award" size={80} /></div>
+                                    <h2 className="text-3xl font-black text-slate-800">完成挑戰！</h2>
+                                    <div className="grid grid-cols-2 gap-4 max-w-sm mx-auto font-black">
                                         <div className="bg-slate-50 p-4 rounded-2xl border">
-                                            <div className="text-slate-400 text-xs font-bold mb-1">總耗時</div>
-                                            <div className="text-2xl font-black text-indigo-600">{formatTime(timer)}</div>
+                                            <div className="text-slate-400 text-[10px]">總耗時</div>
+                                            <div className="text-2xl text-indigo-600">{formatTime(timer)}</div>
                                         </div>
                                         <div className="bg-slate-50 p-4 rounded-2xl border">
-                                            <div className="text-slate-400 text-xs font-bold mb-1">錯誤次數</div>
-                                            <div className="text-2xl font-black text-red-500">{mistakes}</div>
+                                            <div className="text-slate-400 text-[10px]">錯誤次數</div>
+                                            <div className="text-2xl text-red-500">{mistakes}</div>
                                         </div>
                                     </div>
                                     <div className="pt-6 flex flex-col gap-3 max-w-sm mx-auto">
-                                        <button onClick={() => startTask(currentTask)} className="w-full py-4 bg-indigo-50 text-indigo-700 rounded-2xl font-black border-2 border-indigo-100 flex justify-center items-center">
-                                            <Icon name="refresh-cw" size={20} className="mr-2"/>再練一次
-                                        </button>
-                                        <button onClick={() => setGameState('taskSelection')} className="w-full py-4 bg-indigo-700 text-white rounded-2xl font-black shadow-xl flex justify-center items-center">
-                                            <Icon name="play" size={20} className="mr-2"/>下一個任務
-                                        </button>
+                                        <button onClick={() => startTask(currentTask)} className="w-full py-4 bg-indigo-50 text-indigo-700 rounded-2xl font-black border-2 border-indigo-100 flex justify-center items-center"><LucideIcon name="refresh-cw" size={20} className="mr-2"/>再練一次</button>
+                                        <button onClick={() => setGameState('taskSelection')} className="w-full py-4 bg-indigo-700 text-white rounded-2xl font-black shadow-xl flex justify-center items-center"><LucideIcon name="play" size={20} className="mr-2"/>繼續挑戰</button>
                                     </div>
                                 </div>
                             )}
