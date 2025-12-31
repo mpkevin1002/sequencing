@@ -4,13 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>生活步驟排序大師 - 認知訓練遊戲</title>
-    <!-- React & Babel -->
-    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <!-- 1. 核心程式庫：React 與 Babel (確保能執行 JSX) -->
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-    <!-- Tailwind CSS -->
+    <!-- 2. 樣式庫：Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Lucide Icons (UMD) -->
+    <!-- 3. 圖示庫：Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
         @keyframes shake {
@@ -24,37 +24,43 @@
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
         .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
         
-        /* 避免 React 載入前的閃爍 */
-        [v-cloak] { display: none; }
+        #loader {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            font-family: sans-serif;
+            background: #f8fafc;
+        }
     </style>
 </head>
 <body class="bg-slate-50">
+    <!-- 載入中提示：如果看到這個代表網頁正在解析代碼 -->
+    <div id="loader">
+        <div class="text-center">
+            <div class="inline-block w-8 h-8 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin mb-2"></div>
+            <div class="text-slate-500 font-bold">遊戲載入中，請稍候...</div>
+        </div>
+    </div>
+
     <div id="root"></div>
 
     <script type="text/babel">
         const { useState, useEffect, useRef } = React;
         
-        // 重新封裝 Lucide Icon 組件
+        // 圖示組件：確保 Lucide 能正確渲染
         const Icon = ({ name, size = 24, className = "" }) => {
             const iconRef = useRef(null);
             useEffect(() => {
                 if (window.lucide) {
-                    window.lucide.createIcons({
-                        attrs: {
-                            class: className,
-                            'stroke-width': 2,
-                            width: size,
-                            height: size
-                        },
-                        nameAttr: 'data-lucide'
-                    });
+                    window.lucide.createIcons();
                 }
-            }, [name, className, size]);
-            return <i data-lucide={name} className={className}></i>;
+            }, [name, className]);
+            return <i data-lucide={name} className={className} style={{ width: size, height: size }}></i>;
         };
 
         const TASKS_LIBRARY = [
-            // --- 基礎版 (5 步驟) ---
+            // --- 基礎版 (50 題) ---
             { id: 1, difficulty: 'basic', title: "早起刷牙", icon: "🪥", steps: ["拿起牙刷與牙膏", "將牙膏擠在牙刷上", "放入口中均勻刷遍牙齒", "用水漱口並吐掉泡沫", "清洗牙刷並放回原位"] },
             { id: 2, difficulty: 'basic', title: "洗手消毒", icon: "🧼", steps: ["打開水龍頭弄濕雙手", "抹上肥皂並搓出泡沫", "搓揉手心手背與指縫", "用清水將泡沫沖乾淨", "用乾淨毛巾將手擦乾"] },
             { id: 3, difficulty: 'basic', title: "穿襯衫", icon: "👔", steps: ["拿起襯衫披在肩上", "右手伸進右邊袖子", "左手伸進左邊袖子", "由下往上扣好扣子", "調整領口並照鏡子"] },
@@ -106,7 +112,7 @@
             { id: 74, difficulty: 'basic', title: "收碗筷", icon: "🥢", steps: ["用餐完畢站起來", "將筷子放在碗面上", "雙手捧起碗盤送到水槽", "分類放置待洗區域", "擦拭自己用過的桌面"] },
             { id: 75, difficulty: 'basic', title: "摺衛生紙", icon: "🧻", steps: ["抽取適量的衛生紙", "將紙張平鋪在手中", "左右對摺成正方形", "再次摺疊增加厚度", "放入餐盤旁或口袋備用"] },
 
-            // --- 進階版 (7 步驟) ---
+            // --- 進階版 (50 題) ---
             { id: 26, difficulty: 'advanced', title: "洗衣服全流程", icon: "🧺", steps: ["分類衣物深淺色", "放進洗衣機內", "倒入洗衣精與柔軟精", "設定洗衣模式", "取出洗好的濕衣物", "衣架撐起並晾在室外", "乾透後收納入櫃"] },
             { id: 27, difficulty: 'advanced', title: "煮泡麵加蛋", icon: "🍜", steps: ["鍋內裝水煮至沸騰", "放入泡麵麵塊", "倒入所有調味料包", "打入一顆雞蛋進入", "蓋上鍋蓋悶兩分鐘", "攪拌均勻使蛋熟透", "倒入碗中享用"] },
             { id: 28, difficulty: 'advanced', title: "ATM 領錢", icon: "💵", steps: ["插入提款卡", "輸入個人密碼", "選擇「提款」功能", "輸入要領取的金額", "確認明細表需求", "取出提款卡與收據", "領取現金並清點"] },
@@ -172,6 +178,12 @@
             
             const timerRef = useRef(null);
 
+            // 隱藏載入提示
+            useEffect(() => {
+                const loader = document.getElementById('loader');
+                if (loader) loader.style.display = 'none';
+            }, []);
+
             useEffect(() => {
                 if (gameState === 'playing') {
                     timerRef.current = setInterval(() => setTimer(prev => prev + 1), 1000);
@@ -214,7 +226,7 @@
                             title: currentTask.title,
                             difficulty: currentTask.difficulty,
                             time: timer,
-                            errors: mistakes + 1 - 1, // Ensure number type
+                            errors: mistakes,
                             date: new Date().toLocaleDateString() + ' ' + new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})
                         };
                         setHistoryRecords(prev => [newRecord, ...prev]);
